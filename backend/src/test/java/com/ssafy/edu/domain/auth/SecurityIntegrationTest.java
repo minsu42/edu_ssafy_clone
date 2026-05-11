@@ -8,6 +8,7 @@ import com.ssafy.edu.domain.auth.dto.request.RefreshRequest;
 import com.ssafy.edu.domain.auth.entity.Role;
 import com.ssafy.edu.domain.auth.entity.User;
 import com.ssafy.edu.domain.auth.repository.UserRepository;
+import com.ssafy.edu.global.security.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ class SecurityIntegrationTest {
     @Autowired WebApplicationContext wac;
     @Autowired UserRepository userRepository;
     @Autowired PasswordEncoder passwordEncoder;
+    @Autowired JwtProvider jwtProvider;
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
@@ -103,6 +105,15 @@ class SecurityIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.data.refreshToken").isNotEmpty());
+    }
+
+    @Test
+    void DB에없는_userId_토큰_사용시_401() throws Exception {
+        String token = jwtProvider.generateAccessToken(999999L, "STUDENT");
+
+        mockMvc.perform(get("/api/v1/users/me")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isUnauthorized());
     }
 
     private String loginAndGetAccessToken() throws Exception {

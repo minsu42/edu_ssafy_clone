@@ -145,4 +145,16 @@ class AuthServiceTest {
                 .isInstanceOf(ApiException.class)
                 .satisfies(e -> assertThat(((ApiException) e).getErrorCode()).isEqualTo(ErrorCode.TOKEN_INVALID));
     }
+
+    @Test
+    void refresh_DB만료된_토큰_TOKEN_INVALID() {
+        RefreshToken expired = RefreshToken.of(1L, "expired-token", -60L);
+        given(jwtProvider.isTokenValid("expired-token")).willReturn(true);
+        given(refreshTokenRepository.findByToken("expired-token")).willReturn(Optional.of(expired));
+
+        assertThatThrownBy(() -> authService.refresh(new RefreshRequest("expired-token")))
+                .isInstanceOf(ApiException.class)
+                .satisfies(e -> assertThat(((ApiException) e).getErrorCode()).isEqualTo(ErrorCode.TOKEN_INVALID));
+        verify(refreshTokenRepository).delete(expired);
+    }
 }

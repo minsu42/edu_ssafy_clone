@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @Transactional
 public class AuthService {
@@ -87,6 +89,11 @@ public class AuthService {
 
         RefreshToken stored = refreshTokenRepository.findByToken(rawToken)
                 .orElseThrow(() -> new ApiException(ErrorCode.TOKEN_INVALID));
+
+        if (stored.getExpiresAt().isBefore(LocalDateTime.now())) {
+            refreshTokenRepository.delete(stored);
+            throw new ApiException(ErrorCode.TOKEN_INVALID);
+        }
 
         Long userId = jwtProvider.getUserId(rawToken);
 

@@ -1,11 +1,14 @@
 package com.ssafy.edu.domain.auth.entity;
 
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "password_change_histories")
+@EntityListeners(AuditingEntityListener.class)
 public class PasswordChangeHistory {
 
     @Id
@@ -15,8 +18,9 @@ public class PasswordChangeHistory {
     @Column(nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
-    private LocalDateTime changedAt = LocalDateTime.now();
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime changedAt;
 
     @Column(length = 45)
     private String ipAddress;
