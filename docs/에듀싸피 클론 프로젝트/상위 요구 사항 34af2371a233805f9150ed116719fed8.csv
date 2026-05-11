@@ -1,0 +1,9 @@
+식별자,상위 요구 사항명,관련근거
+FR-AUTH,사용자 인증 및 계정 관리,
+FR-DASHBOARD,메인 대시보드 및 개인 학습 현황,
+"FR-LECTURE ",강의실 및 학습 콘텐츠,
+FR-QUEST,Quest / 평가 관리,
+FR-COMMUNITY,커뮤니티 및 게시판,
+"FR-NOTICE ",공지 및 알림,
+FR-EXTERNAL,외부 서비스 및 부가 연동,
+"FR-NAV  ",공통 UI 및 네비게이션,

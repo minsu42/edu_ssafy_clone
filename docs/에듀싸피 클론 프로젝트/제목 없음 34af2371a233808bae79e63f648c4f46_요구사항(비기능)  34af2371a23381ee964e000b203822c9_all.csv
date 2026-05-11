@@ -1,0 +1,2 @@
+식별자,관련 기능 요구사항,상위 요구 사항 ,상위 항목,상태,요구사항명,우선순위,하위 항목
+NFR-SEC-AUTH-001,"NFR-AUTH-LOGIN-001 (https://www.notion.so/NFR-AUTH-LOGIN-001-34af2371a233808db76fdbfd0a39fc8f?pvs=21), NFR-AUTH-SESSION-001 (https://www.notion.so/NFR-AUTH-SESSION-001-34af2371a23380d1ac44f91d74400dc4?pvs=21)",FR-AUTH (https://www.notion.so/FR-AUTH-34af2371a233800f9040c7041c8c1f66?pvs=21),,,비인가 사용자 접근 차단,상,
