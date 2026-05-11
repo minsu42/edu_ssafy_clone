@@ -1,0 +1,28 @@
+# Claude Code 로컬 설정
+.claude/settings.local.json
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 백엔드
+backend/build/
+backend/.gradle/
+backend/out/
+*.class
+*.jar
+
+# 프론트엔드
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+
+# 환경변수
+.env
+.env.*
+!.env.example
