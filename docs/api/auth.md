@@ -5,8 +5,7 @@
 - **기준 요구사항**: `docs/requirements/03_기능_요구사항.md` FR-AUTH-* 항목
 - **기준 경로 prefix**: `/api/v1`
 
-> **설계 결정 — Refresh Token 저장**: schema.sql에 refresh_tokens 테이블 없음.
-> P1 구현 시 `refresh_tokens` 테이블을 schema.sql에 추가하고 사용자 승인 후 적용한다.
+> **설계 결정 — Refresh Token 저장**: `refresh_tokens` 테이블을 schema.sql에 추가 완료.
 > 추상화 인터페이스(`RefreshTokenRepository`)로 구현하여 추후 Redis 전환 가능하도록 한다.
 
 ---
@@ -110,7 +109,7 @@ HTTP 204 No Content
 
 | HTTP | code | 조건 |
 |------|------|------|
-| 401 | ERR-CMN-002 | Authorization 헤더 없음 |
+| 401 | ERR-CMN-004 | Authorization 헤더 없음 |
 | 401 | ERR-AUTH-003 | 만료된 Access Token |
 | 401 | ERR-AUTH-004 | 유효하지 않은 Access Token |
 
@@ -220,7 +219,7 @@ HTTP 204 No Content
 
 | HTTP | code | 조건 |
 |------|------|------|
-| 401 | ERR-CMN-002 | Authorization 헤더 없음 |
+| 401 | ERR-CMN-004 | Authorization 헤더 없음 |
 | 401 | ERR-AUTH-003 | 만료된 Access Token |
 | 401 | ERR-AUTH-004 | 유효하지 않은 Access Token |
 
@@ -264,7 +263,7 @@ HTTP 204 No Content
 
 | HTTP | code | 조건 |
 |------|------|------|
-| 401 | ERR-CMN-002 | Authorization 헤더 없음 |
+| 401 | ERR-CMN-004 | Authorization 헤더 없음 |
 | 401 | ERR-AUTH-003 | 만료된 Access Token |
 | 404 | ERR-CMN-001 | profileFileId에 해당하는 파일 없음 |
 
@@ -301,7 +300,7 @@ HTTP 204 No Content
 |------|------|------|
 | 400 | ERR-CMN-003 | 필드 누락 또는 새 비밀번호 유효성 실패 |
 | 400 | ERR-AUTH-005 | 현재 비밀번호 불일치 |
-| 401 | ERR-CMN-002 | Authorization 헤더 없음 |
+| 401 | ERR-CMN-004 | Authorization 헤더 없음 |
 | 401 | ERR-AUTH-003 | 만료된 Access Token |
 
 ---
@@ -323,7 +322,7 @@ HTTP 204 No Content
 
 | HTTP | code | 조건 |
 |------|------|------|
-| 401 | ERR-CMN-002 | Authorization 헤더 없음 |
+| 401 | ERR-CMN-004 | Authorization 헤더 없음 |
 | 401 | ERR-AUTH-003 | 만료된 Access Token |
 
 ---
