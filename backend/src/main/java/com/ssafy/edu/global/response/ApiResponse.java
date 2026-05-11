@@ -18,8 +18,12 @@ public class ApiResponse<T> {
         this.timestamp = Instant.now();
     }
 
-    public static <T> ApiResponse<T> ok(T data) {
+    public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse<>(true, data, null, null);
+    }
+
+    public static <T> ApiResponse<T> ok(T data) {
+        return success(data);
     }
 
     public static ApiResponse<Void> error(String code, String message) {

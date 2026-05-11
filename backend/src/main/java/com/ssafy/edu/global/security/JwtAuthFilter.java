@@ -1,5 +1,7 @@
 package com.ssafy.edu.global.security;
 
+import com.ssafy.edu.domain.auth.entity.UserStatus;
+import com.ssafy.edu.domain.auth.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,9 +18,11 @@ import java.util.List;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
 
-    public JwtAuthFilter(JwtProvider jwtProvider) {
+    public JwtAuthFilter(JwtProvider jwtProvider, UserRepository userRepository) {
         this.jwtProvider = jwtProvider;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -27,13 +31,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = extractToken(request);
         if (StringUtils.hasText(token) && jwtProvider.isTokenValid(token)) {
             Long userId = jwtProvider.getUserId(token);
-            String role = jwtProvider.getRole(token);
-            var auth = new UsernamePasswordAuthenticationToken(
-                    userId,
-                    null,
-                    List.of(new SimpleGrantedAuthority("ROLE_" + role))
-            );
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            // FR-AUTH-STATUS-001: reject INACTIVE/WITHDRAWN accounts on each request
+            boolean isActive = userRepository.findById(userId)
+                    .map(u -> u.getStatus() == UserStatus.ACTIVE)
+                    .orElse(false);
+            if (isActive) {
+                String role = jwtProvider.getRole(token);
+                var auth = new UsernamePasswordAuthenticationToken(
+                        userId,
+                        null,
+                        List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                );
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
         }
         chain.doFilter(request, response);
     }
