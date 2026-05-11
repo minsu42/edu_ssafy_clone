@@ -1,5 +1,6 @@
 package com.ssafy.edu.global.config;
 
+import com.ssafy.edu.domain.auth.repository.UserRepository;
 import com.ssafy.edu.global.security.JwtAuthFilter;
 import com.ssafy.edu.global.security.JwtProvider;
 import org.springframework.context.annotation.Bean;
@@ -14,15 +15,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
 
-    public SecurityConfig(JwtProvider jwtProvider) {
+    public SecurityConfig(JwtProvider jwtProvider, UserRepository userRepository) {
         this.jwtProvider = jwtProvider;
+        this.userRepository = userRepository;
     }
 
     @Bean
@@ -39,7 +44,11 @@ public class SecurityConfig {
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(new JwtAuthFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
+            .exceptionHandling(e -> e
+                .authenticationEntryPoint((req, res, ex) ->
+                        res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+            )
+            .addFilterBefore(new JwtAuthFilter(jwtProvider, userRepository), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
