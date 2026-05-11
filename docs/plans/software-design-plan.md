@@ -1,10 +1,21 @@
 # edu_ssafy_clone 소프트웨어 설계 계획서
 
+최종 확인일: 2026-05-11
+
+
 > 본 문서는 `edu.ssafy.com` 교육 포털의 메인 대시보드를 시작점으로, Spring Boot 백엔드와 Vue 프론트엔드를 사용해 풀스택 클론 프로젝트를 구현하기 위한 설계 계획서다.
 >
 > 디자인 기준: `DESIGN.md`
 > 구현 목표: 실제 서비스와 거의 100%에 가까운 화면 구조, 정보 배치, 색상, 인터랙션 재현
 > 1차 구현 범위: 메인 대시보드
+
+## 0. 현재 저장소 상태
+
+- 현재 저장소는 문서/설계 산출물 중심이며, 실제 `frontend/`, `backend/`, `package.json`, `build.gradle` 스캐폴딩은 아직 없다.
+- 일반 문서 인덱스는 `docs/README.md`를 기준으로 한다.
+- 시각 참조는 `docs/design/screenshots/`의 40개 PNG와 `docs/design/reference-inventory.md`를 기준으로 한다.
+- DB 기준은 `docs/database/schema.sql` 및 `docs/database/tables.md`이다.
+- OMX 실행 계획과 검증 지도는 `.omx/plans/first-deployment.md`, `.omx/plans/first-deployment-verification.md`에 있다.
 
 ---
 
@@ -204,6 +215,7 @@ frontend/
       layout/
     pages/
       DashboardPage.vue
+      LoginPage.vue
     services/
       apiClient.ts
       dashboardApi.ts
@@ -256,118 +268,42 @@ backend/
 
 ## 5.1 핵심 엔티티
 
+상세 DB 기준은 `docs/database/schema.sql`과 `docs/database/tables.md`를 우선한다. 설계상 주요 도메인은 다음과 같다.
+
 ```text
-User
-- id PK
-- email
-- password_hash
-- name
-- campus
-- class_name
-- track
-- generation
-- role
-- created_at
-- updated_at
-
-Attendance
-- id PK
-- user_id FK
-- attendance_date
-- status
-- check_in_time
-- check_out_time
-- created_at
-
-ScholarshipPoint
-- id PK
-- user_id FK
-- point
-- reason
-- point_type
-- earned_at
-
-UserLevel
-- id PK
-- user_id FK
-- level
-- exp
-- required_exp
-- updated_at
-
-Notification
-- id PK
-- title
-- content
-- category
-- is_required
-- published_at
-
-CurriculumSchedule
-- id PK
-- week_no
-- schedule_date
-- start_time
-- end_time
-- category
-- title
-- instructor
-- classroom
-- replay_url
-- material_url
-
-Quest
-- id PK
-- title
-- quest_type
-- status
-- start_at
-- due_at
-- score
-
-LearningMaterial
-- id PK
-- title
-- category
-- file_url
-- created_at
-
-ELearning
-- id PK
-- user_id FK
-- title
-- progress_rate
-- status
-- last_studied_at
-
-Board
-- id PK
-- name
-- board_type
-
-Post
-- id PK
-- board_id FK
-- user_id FK
-- title
-- content
-- view_count
-- created_at
-- updated_at
+users, files, courses, education_calendar_days,
+attendance_records, attendance_appeals,
+point_transactions, user_stats,
+user_bookmarks, user_content_interactions,
+boards, board_categories, board_posts, board_comments,
+course_weeks, course_sessions,
+learning_categories, learning_contents, user_learning_progresses,
+course_tasks, user_task_results, user_activity_records,
+survey_categories, surveys, survey_questions, survey_participants,
+inquiries, notifications, agreements, user_agreements,
+password_change_histories, audit_logs
 ```
+
+대시보드 1차 구현에서는 위 전체 모델 중 사용자, 출석, 포인트/통계, 커리큘럼, 과제/평가, 학습 콘텐츠, 게시판, 알림 영역을 우선 사용한다.
 
 ## 5.2 관계 정의
 
+관계 정의는 `docs/database/schema.sql`의 FK를 기준으로 한다. 대표 관계는 다음과 같다.
+
 ```text
-User 1 : N Attendance
-User 1 : N ScholarshipPoint
-User 1 : 1 UserLevel
-User 1 : N ELearning
-User 1 : N Post
-Board 1 : N Post
+users 1 : N attendance_records
+users 1 : N point_transactions
+users 1 : 1 user_stats
+users 1 : N user_learning_progresses
+users 1 : N board_posts
+boards 1 : N board_posts
+courses 1 : N course_weeks
+course_weeks 1 : N course_sessions
+learning_categories 1 : N learning_contents
+course_tasks 1 : N user_task_results
 ```
 
-`Notification`, `CurriculumSchedule`, `Quest`, `LearningMaterial`은 1차 구현에서는 전체 사용자 공통 데이터로 취급한다. 추후 교육생별 권한/반/트랙 기준 필터링이 필요하면 매핑 테이블을 추가한다.
+알림, 커리큘럼, 학습자료는 1차 구현에서 더미/seed 데이터로 제공하고, 추후 교육생별 권한/반/트랙 기준 필터링이 필요하면 매핑 테이블 또는 조건 컬럼을 추가한다.
 
 ## 5.3 상태 Enum
 
@@ -708,16 +644,21 @@ QuestService
 
 ```text
 UserRepository
-AttendanceRepository
-ScholarshipPointRepository
-UserLevelRepository
+AttendanceRecordRepository
+PointTransactionRepository
+UserStatRepository
 NotificationRepository
-CurriculumScheduleRepository
-QuestRepository
-LearningMaterialRepository
-ELearningRepository
+CourseRepository
+CourseWeekRepository
+CourseSessionRepository
+CourseTaskRepository
+UserTaskResultRepository
+LearningCategoryRepository
+LearningContentRepository
+UserLearningProgressRepository
 BoardRepository
-PostRepository
+BoardPostRepository
+BoardCommentRepository
 ```
 
 ## 9.4 DTO 설계 원칙

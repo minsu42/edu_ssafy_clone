@@ -1,0 +1,1709 @@
+openapi: 3.1.0
+info:
+  title: Edu SSAFY Clone API
+  version: 0.1.0
+  summary: API contract for the edu.ssafy.com-inspired independent clone service.
+  description: |
+    This API describes an independent clone service inspired by edu.ssafy.com.
+    It does not integrate with real SSAFY accounts, real edu.ssafy.com APIs, or private production data.
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+  - url: https://api.example.com/api/v1
+    description: Deployment placeholder; replace after deployment is selected.
+tags:
+  - name: Auth
+    description: FR-AUTH 사용자 인증 및 계정 관리
+  - name: Users
+    description: FR-AUTH 사용자 프로필 및 계정 관리
+  - name: Dashboard
+    description: FR-DASHBOARD 메인 대시보드 및 개인 학습 현황
+  - name: Notice
+    description: FR-NOTICE 공지 및 알림
+  - name: Lecture
+    description: FR-LECTURE 강의실 및 학습 콘텐츠
+  - name: Quest
+    description: FR-QUEST Quest / 평가 관리
+  - name: Community
+    description: FR-COMMUNITY 커뮤니티 및 게시판
+  - name: External
+    description: FR-EXTERNAL 외부 서비스 및 부가 연동
+  - name: Navigation
+    description: FR-NAV 공통 UI 및 네비게이션
+  - name: App
+    description: 앱 초기화와 공통 bootstrap
+security:
+  - bearerAuth: []
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: 로그인
+      description: 데모/시드 사용자의 이메일과 비밀번호로 access token을 발급한다.
+      operationId: login
+      security: []
+      x-requirement-id: FR-AUTH
+      x-functional-requirement-id: NFR-AUTH-LOGIN-001
+      x-status: first-release
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              demoUser:
+                summary: 데모 사용자 로그인
+                value:
+                  email: student@example.com
+                  password: password123!
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginApiResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      accessToken: demo-access-token
+                      tokenType: Bearer
+                      expiresIn: 3600
+                      user:
+                        id: 1
+                        email: student@example.com
+                        name: 김싸피
+                        studentNo: '1100001'
+                        generation: 12
+                        region: 서울
+                        classNo: 1
+                        role: STUDENT
+                        status: ACTIVE
+                        profileImageUrl: null
+                    error: null
+                    meta: null
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: 로그인 실패
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+              examples:
+                invalidCredentials:
+                  value:
+                    success: false
+                    data: null
+                    error:
+                      code: AUTH_INVALID_CREDENTIALS
+                      message: 이메일 또는 비밀번호가 올바르지 않습니다.
+                      details: []
+                    meta: null
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: 로그아웃
+      description: 서버 상태 변경이 없는 토큰 기반 로그아웃 계약이다. 클라이언트는 저장된 token을 제거한다.
+      operationId: logout
+      x-requirement-id: FR-AUTH
+      x-functional-requirement-id: NFR-AUTH-LOGOUT-001
+      x-status: first-release
+      responses:
+        '200':
+          description: 로그아웃 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyApiResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data: null
+                    error: null
+                    meta: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: 토큰 갱신
+      description: 첫 배포에서는 선택 구현 대상이다. refresh token 저장/회전 정책을 확정한 뒤 planned 범위에서 구현한다.
+      operationId: refreshToken
+      security: []
+      x-requirement-id: FR-AUTH
+      x-functional-requirement-id: NFR-AUTH-SESSION-001
+      x-status: planned
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: 토큰 갱신 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginApiResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: 현재 로그인 사용자 조회
+      description: access token 기준 현재 사용자 기본 정보를 반환한다. 비밀번호 등 민감 정보는 반환하지 않는다.
+      operationId: getCurrentUser
+      x-requirement-id: FR-AUTH
+      x-functional-requirement-id: NFR-AUTH-PROFILE-001
+      x-status: first-release
+      responses:
+        '200':
+          description: 현재 사용자 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUserApiResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      id: 1
+                      email: student@example.com
+                      name: 김싸피
+                      studentNo: '1100001'
+                      generation: 12
+                      region: 서울
+                      classNo: 1
+                      role: STUDENT
+                      status: ACTIVE
+                      profileImageUrl: null
+                    error: null
+                    meta: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /users/me/profile:
+    patch:
+      tags: [Users]
+      summary: 사용자 정보 수정
+      operationId: updateMyProfile
+      x-requirement-id: FR-AUTH
+      x-functional-requirement-id: NFR-AUTH-PROFILE-002
+      x-status: planned
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: 사용자 정보 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUserApiResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /users/me/password:
+    patch:
+      tags: [Users]
+      summary: 비밀번호 변경
+      operationId: changeMyPassword
+      x-requirement-id: FR-AUTH
+      x-functional-requirement-id: NFR-AUTH-CREDENTIAL-001
+      x-status: planned
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: 비밀번호 변경 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyApiResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /users/me:
+    delete:
+      tags: [Users]
+      summary: 계정 비활성화 또는 탈퇴
+      operationId: withdrawMe
+      x-requirement-id: FR-AUTH
+      x-functional-requirement-id: NFR-AUTH-WITHDRAW-001
+      x-status: planned
+      responses:
+        '200':
+          description: 계정 비활성화 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmptyApiResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /dashboard/me:
+    get:
+      tags: [Dashboard]
+      summary: 내 메인 대시보드 통합 조회
+      description: 로그인 후 첫 화면에 필요한 사용자, 공지, 알림, 출결, 포인트/EXP, 오늘 일정 요약을 반환한다.
+      operationId: getMyDashboard
+      x-requirement-id: FR-DASHBOARD
+      x-status: first-release
+      responses:
+        '200':
+          description: 대시보드 통합 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardApiResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      userSummary:
+                        id: 1
+                        name: 김싸피
+                        generation: 12
+                        region: 서울
+                        classNo: 1
+                        levelName: Silver
+                        profileImageUrl: null
+                      noticeSummary:
+                        totalCount: 2
+                        items:
+                          - id: 101
+                            title: 5월 공통 프로젝트 일정 안내
+                            category: 공지
+                            createdAt: '2026-05-01T09:00:00'
+                            isImportant: true
+                      notificationSummary:
+                        unreadCount: 1
+                        items:
+                          - id: 201
+                            title: 출석 확인이 필요합니다
+                            message: 오늘 퇴실 체크를 잊지 마세요.
+                            type: ATTENDANCE
+                            isRead: false
+                            createdAt: '2026-05-11T08:30:00'
+                      attendanceSummary:
+                        attendanceRate: 98.5
+                        normalCount: 42
+                        lateCount: 1
+                        absentCount: 0
+                        earlyLeaveCount: 0
+                        todayStatus: NORMAL
+                        todayCheckInAt: '2026-05-11T08:55:00'
+                        todayCheckOutAt: null
+                      pointSummary:
+                        scholarshipPoint: 1200
+                        totalExp: 3450
+                        levelName: Silver
+                        levelNo: 2
+                        nextLevelExp: 4000
+                      todayScheduleSummary:
+                        - id: 301
+                          title: 알고리즘 라이브 강의
+                          startsAt: '2026-05-11T10:00:00'
+                          endsAt: '2026-05-11T12:00:00'
+                          status: SCHEDULED
+                    error: null
+                    meta: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /dashboard/me/attendance-summary:
+    get:
+      tags: [Dashboard]
+      summary: 내 출결 요약 조회
+      operationId: getMyAttendanceSummary
+      x-requirement-id: FR-DASHBOARD
+      x-status: first-release
+      responses:
+        '200':
+          description: 출결 요약 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceSummaryApiResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      attendanceRate: 98.5
+                      normalCount: 42
+                      lateCount: 1
+                      absentCount: 0
+                      earlyLeaveCount: 0
+                      todayStatus: NORMAL
+                      todayCheckInAt: '2026-05-11T08:55:00'
+                      todayCheckOutAt: null
+                    error: null
+                    meta: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /dashboard/me/point-summary:
+    get:
+      tags: [Dashboard]
+      summary: 내 포인트/EXP 요약 조회
+      operationId: getMyPointSummary
+      x-requirement-id: FR-DASHBOARD
+      x-status: first-release
+      responses:
+        '200':
+          description: 포인트/EXP 요약 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointSummaryApiResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      scholarshipPoint: 1200
+                      totalExp: 3450
+                      levelName: Silver
+                      levelNo: 2
+                      nextLevelExp: 4000
+                    error: null
+                    meta: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /notices:
+    get:
+      tags: [Notice]
+      summary: 공지 목록 조회
+      operationId: listNotices
+      x-requirement-id: FR-NOTICE
+      x-status: first-release
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: 공지 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoticeListApiResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      - id: 101
+                        title: 5월 공통 프로젝트 일정 안내
+                        category: 공지
+                        createdAt: '2026-05-01T09:00:00'
+                        isImportant: true
+                      - id: 102
+                        title: 교육생 만족도 설문 안내
+                        category: 설문
+                        createdAt: '2026-05-03T13:30:00'
+                        isImportant: false
+                    error: null
+                    meta:
+                      page: 0
+                      size: 20
+                      totalElements: 2
+                      totalPages: 1
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /notifications/me:
+    get:
+      tags: [Notice]
+      summary: 내 알림 목록 조회
+      operationId: listMyNotifications
+      x-requirement-id: FR-NOTICE
+      x-status: first-release
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: unreadOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: 알림 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationListApiResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      - id: 201
+                        title: 출석 확인이 필요합니다
+                        message: 오늘 퇴실 체크를 잊지 마세요.
+                        type: ATTENDANCE
+                        isRead: false
+                        createdAt: '2026-05-11T08:30:00'
+                    error: null
+                    meta:
+                      page: 0
+                      size: 20
+                      totalElements: 1
+                      totalPages: 1
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /notifications/me/{notificationId}/read:
+    patch:
+      tags: [Notice]
+      summary: 알림 읽음 처리
+      operationId: markNotificationRead
+      x-requirement-id: FR-NOTICE
+      x-status: planned
+      parameters:
+        - $ref: '#/components/parameters/NotificationIdParam'
+      responses:
+        '200':
+          description: 읽음 처리 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationApiResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /courses:
+    get:
+      tags: [Lecture]
+      summary: 과정 목록 조회
+      operationId: listCourses
+      x-requirement-id: FR-LECTURE
+      x-status: planned
+      parameters:
+        - name: generation
+          in: query
+          schema:
+            type: integer
+        - name: region
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 과정 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseListApiResponse'
+  /courses/{courseId}:
+    get:
+      tags: [Lecture]
+      summary: 과정 상세 조회
+      operationId: getCourse
+      x-requirement-id: FR-LECTURE
+      x-status: planned
+      parameters:
+        - $ref: '#/components/parameters/CourseIdParam'
+      responses:
+        '200':
+          description: 과정 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseApiResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /courses/{courseId}/weeks:
+    get:
+      tags: [Lecture]
+      summary: 과정 주차 목록 조회
+      operationId: listCourseWeeks
+      x-requirement-id: FR-LECTURE
+      x-status: planned
+      parameters:
+        - $ref: '#/components/parameters/CourseIdParam'
+      responses:
+        '200':
+          description: 과정 주차 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseWeekListApiResponse'
+  /course-sessions/{sessionId}:
+    get:
+      tags: [Lecture]
+      summary: 강의 세션 상세 조회
+      operationId: getCourseSession
+      x-requirement-id: FR-LECTURE
+      x-status: planned
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+      responses:
+        '200':
+          description: 강의 세션 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSessionApiResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /learning-contents:
+    get:
+      tags: [Lecture]
+      summary: 학습 콘텐츠 목록 조회
+      operationId: listLearningContents
+      x-requirement-id: FR-LECTURE
+      x-status: planned
+      parameters:
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: 학습 콘텐츠 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningContentListApiResponse'
+  /learning-contents/{contentId}/progress:
+    patch:
+      tags: [Lecture]
+      summary: 학습 진행률 갱신
+      operationId: updateLearningProgress
+      x-requirement-id: FR-LECTURE
+      x-status: planned
+      parameters:
+        - $ref: '#/components/parameters/ContentIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLearningProgressRequest'
+      responses:
+        '200':
+          description: 학습 진행률 갱신 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningProgressApiResponse'
+  /quests:
+    get:
+      tags: [Quest]
+      summary: Quest/과제 목록 조회
+      operationId: listQuests
+      x-requirement-id: FR-QUEST
+      x-status: planned
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [OPEN, SUBMITTED, CLOSED]
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: Quest 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestListApiResponse'
+  /quests/{questId}:
+    get:
+      tags: [Quest]
+      summary: Quest 상세 조회
+      operationId: getQuest
+      x-requirement-id: FR-QUEST
+      x-status: planned
+      parameters:
+        - $ref: '#/components/parameters/QuestIdParam'
+      responses:
+        '200':
+          description: Quest 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestApiResponse'
+  /quests/{questId}/submissions:
+    post:
+      tags: [Quest]
+      summary: Quest 제출
+      operationId: submitQuest
+      x-requirement-id: FR-QUEST
+      x-status: planned
+      parameters:
+        - $ref: '#/components/parameters/QuestIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestSubmissionRequest'
+      responses:
+        '201':
+          description: Quest 제출 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestResultApiResponse'
+  /quests/{questId}/result:
+    get:
+      tags: [Quest]
+      summary: 내 Quest 결과 조회
+      operationId: getMyQuestResult
+      x-requirement-id: FR-QUEST
+      x-status: planned
+      parameters:
+        - $ref: '#/components/parameters/QuestIdParam'
+      responses:
+        '200':
+          description: Quest 결과 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestResultApiResponse'
+  /boards:
+    get:
+      tags: [Community]
+      summary: 게시판 목록 조회
+      operationId: listBoards
+      x-requirement-id: FR-COMMUNITY
+      x-status: planned
+      responses:
+        '200':
+          description: 게시판 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardListApiResponse'
+  /boards/{boardCode}/posts:
+    get:
+      tags: [Community]
+      summary: 게시글 목록 조회
+      operationId: listBoardPosts
+      x-requirement-id: FR-COMMUNITY
+      x-status: planned
+      parameters:
+        - $ref: '#/components/parameters/BoardCodeParam'
+        - name: keyword
+          in: query
+          schema:
+            type: string
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: 게시글 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostListApiResponse'
+    post:
+      tags: [Community]
+      summary: 게시글 작성
+      operationId: createBoardPost
+      x-requirement-id: FR-COMMUNITY
+      x-status: deferred
+      description: 첫 배포 범위에서 제외된다. 후속 커뮤니티 쓰기 기능에서 재검토한다.
+      parameters:
+        - $ref: '#/components/parameters/BoardCodeParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+      responses:
+        '201':
+          description: 게시글 작성 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostApiResponse'
+  /posts/{postId}:
+    get:
+      tags: [Community]
+      summary: 게시글 상세 조회
+      operationId: getPost
+      x-requirement-id: FR-COMMUNITY
+      x-status: planned
+      parameters:
+        - $ref: '#/components/parameters/PostIdParam'
+      responses:
+        '200':
+          description: 게시글 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostApiResponse'
+  /posts/{postId}/comments:
+    post:
+      tags: [Community]
+      summary: 댓글 작성
+      operationId: createPostComment
+      x-requirement-id: FR-COMMUNITY
+      x-status: deferred
+      description: 첫 배포 범위에서 제외된다. 후속 커뮤니티 댓글 기능에서 재검토한다.
+      parameters:
+        - $ref: '#/components/parameters/PostIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequest'
+      responses:
+        '201':
+          description: 댓글 작성 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentApiResponse'
+  /external-links:
+    get:
+      tags: [External]
+      summary: 외부 링크 카드 목록 조회
+      description: SSAFY Git 등 단순 링크 메타데이터만 제공한다. 실제 외부 서비스 API 호출은 하지 않는다.
+      operationId: listExternalLinks
+      x-requirement-id: FR-EXTERNAL
+      x-status: planned
+      responses:
+        '200':
+          description: 외부 링크 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalLinkListApiResponse'
+  /navigation/me:
+    get:
+      tags: [Navigation]
+      summary: 내 권한 기준 네비게이션 조회
+      operationId: getMyNavigation
+      x-requirement-id: FR-NAV
+      x-status: first-release
+      responses:
+        '200':
+          description: 네비게이션 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationApiResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      items:
+                        - key: dashboard
+                          label: 홈
+                          path: /dashboard
+                          enabled: true
+                          children: []
+                        - key: classroom
+                          label: 강의실
+                          path: /classroom
+                          enabled: false
+                          children: []
+                    error: null
+                    meta: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /app/bootstrap:
+    get:
+      tags: [App]
+      summary: 앱 초기화 정보 조회
+      operationId: getAppBootstrap
+      x-requirement-id: FR-NAV
+      x-status: planned
+      responses:
+        '200':
+          description: 앱 초기화 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppBootstrapApiResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    SizeParam:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    NotificationIdParam:
+      name: notificationId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    CourseIdParam:
+      name: courseId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    SessionIdParam:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    ContentIdParam:
+      name: contentId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    QuestIdParam:
+      name: questId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    BoardCodeParam:
+      name: boardCode
+      in: path
+      required: true
+      schema:
+        type: string
+        example: NOTICE
+    PostIdParam:
+      name: postId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+  responses:
+    ValidationError:
+      description: 요청 검증 실패
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorApiResponse'
+          examples:
+            validationError:
+              value:
+                success: false
+                data: null
+                error:
+                  code: VALIDATION_ERROR
+                  message: 요청 값이 올바르지 않습니다.
+                  details:
+                    - field: email
+                      reason: 이메일 형식이어야 합니다.
+                meta: null
+    Unauthorized:
+      description: 인증 필요
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorApiResponse'
+          examples:
+            unauthorized:
+              value:
+                success: false
+                data: null
+                error:
+                  code: AUTH_UNAUTHORIZED
+                  message: 인증이 필요합니다.
+                  details: []
+                meta: null
+    NotFound:
+      description: 리소스 없음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorApiResponse'
+          examples:
+            notFound:
+              value:
+                success: false
+                data: null
+                error:
+                  code: RESOURCE_NOT_FOUND
+                  message: 요청한 리소스를 찾을 수 없습니다.
+                  details: []
+                meta: null
+  schemas:
+    ApiResponse:
+      type: object
+      required: [success, data, error]
+      properties:
+        success:
+          type: boolean
+        data:
+          description: 성공 시 payload. 오류 시 null.
+        error:
+          anyOf:
+            - $ref: '#/components/schemas/ErrorBody'
+            - type: 'null'
+        meta:
+          anyOf:
+            - $ref: '#/components/schemas/PageMeta'
+            - type: 'null'
+    EmptyApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: 'null'
+    ErrorApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            success:
+              const: false
+            data:
+              type: 'null'
+            error:
+              $ref: '#/components/schemas/ErrorBody'
+    ErrorBody:
+      type: object
+      required: [code, message, details]
+      properties:
+        code:
+          type: string
+          enum: [VALIDATION_ERROR, AUTH_INVALID_CREDENTIALS, AUTH_UNAUTHORIZED, AUTH_FORBIDDEN, RESOURCE_NOT_FOUND, CONFLICT, INTERNAL_ERROR]
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    PageMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: student@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: password123!
+    RefreshTokenRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+          description: Planned refresh token. 첫 배포에서는 구현하지 않아도 된다.
+    LoginResponse:
+      type: object
+      required: [accessToken, tokenType, expiresIn, user]
+      properties:
+        accessToken:
+          type: string
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+          description: access token lifetime in seconds
+        user:
+          $ref: '#/components/schemas/CurrentUser'
+    LoginApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/LoginResponse'
+    CurrentUser:
+      type: object
+      required: [id, email, name, role, status]
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        studentNo:
+          type: [string, "null"]
+        generation:
+          type: [integer, "null"]
+        region:
+          type: [string, "null"]
+        classNo:
+          type: [integer, "null"]
+        role:
+          type: string
+          enum: [STUDENT, ADMIN, OPERATOR, MENTOR]
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, WITHDRAWN]
+        profileImageUrl:
+          type: [string, "null"]
+          format: uri
+    CurrentUserApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/CurrentUser'
+    UpdateProfileRequest:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+        emergencyPhoneNumber:
+          type: string
+        zipCode:
+          type: string
+        address:
+          type: string
+        addressDetail:
+          type: string
+    ChangePasswordRequest:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+          format: password
+        newPassword:
+          type: string
+          format: password
+          minLength: 8
+    Dashboard:
+      type: object
+      required: [userSummary, noticeSummary, notificationSummary, attendanceSummary, pointSummary, todayScheduleSummary]
+      properties:
+        userSummary:
+          $ref: '#/components/schemas/UserSummary'
+        noticeSummary:
+          $ref: '#/components/schemas/NoticeSummary'
+        notificationSummary:
+          $ref: '#/components/schemas/NotificationSummary'
+        attendanceSummary:
+          $ref: '#/components/schemas/AttendanceSummary'
+        pointSummary:
+          $ref: '#/components/schemas/PointSummary'
+        todayScheduleSummary:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduleSummary'
+    DashboardApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Dashboard'
+    UserSummary:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        generation:
+          type: [integer, "null"]
+        region:
+          type: [string, "null"]
+        classNo:
+          type: [integer, "null"]
+        levelName:
+          type: [string, "null"]
+        profileImageUrl:
+          type: [string, "null"]
+          format: uri
+    NoticeSummary:
+      type: object
+      required: [totalCount, items]
+      properties:
+        totalCount:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoticeItem'
+    NoticeItem:
+      type: object
+      required: [id, title, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        category:
+          type: [string, "null"]
+        createdAt:
+          type: string
+          format: date-time
+        isImportant:
+          type: boolean
+          default: false
+    NotificationSummary:
+      type: object
+      required: [unreadCount, items]
+      properties:
+        unreadCount:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationItem'
+    NotificationItem:
+      type: object
+      required: [id, title, message, type, isRead, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        message:
+          type: string
+        type:
+          type: string
+          enum: [NOTICE, ATTENDANCE, QUEST, SYSTEM]
+        isRead:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    AttendanceSummary:
+      type: object
+      required: [attendanceRate, normalCount, lateCount, absentCount, earlyLeaveCount, todayStatus]
+      properties:
+        attendanceRate:
+          type: number
+          format: double
+        normalCount:
+          type: integer
+        lateCount:
+          type: integer
+        absentCount:
+          type: integer
+        earlyLeaveCount:
+          type: integer
+        todayStatus:
+          type: string
+          enum: [NORMAL, LATE, ABSENT, EARLY_LEAVE, OUTING, EXCUSED, PENDING]
+        todayCheckInAt:
+          type: [string, "null"]
+          format: date-time
+        todayCheckOutAt:
+          type: [string, "null"]
+          format: date-time
+    AttendanceSummaryApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AttendanceSummary'
+    PointSummary:
+      type: object
+      required: [scholarshipPoint, totalExp, levelNo]
+      properties:
+        scholarshipPoint:
+          type: integer
+        totalExp:
+          type: integer
+        levelName:
+          type: [string, "null"]
+        levelNo:
+          type: integer
+        nextLevelExp:
+          type: [integer, "null"]
+    PointSummaryApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/PointSummary'
+    ScheduleSummary:
+      type: object
+      required: [id, title, startsAt, endsAt, status]
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        startsAt:
+          type: [string, "null"]
+          format: date-time
+        endsAt:
+          type: [string, "null"]
+          format: date-time
+        status:
+          type: string
+          enum: [SCHEDULED, COMPLETED, CANCELLED]
+    NoticeListApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/NoticeItem'
+            meta:
+              $ref: '#/components/schemas/PageMeta'
+    NotificationListApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/NotificationItem'
+            meta:
+              $ref: '#/components/schemas/PageMeta'
+    NotificationApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/NotificationItem'
+    Course:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: [string, "null"]
+        generation:
+          type: [integer, "null"]
+        region:
+          type: [string, "null"]
+        classNo:
+          type: [integer, "null"]
+        instructorName:
+          type: [string, "null"]
+        status:
+          type: string
+          enum: [PLANNED, OPEN, CLOSED]
+        startDate:
+          type: [string, "null"]
+          format: date
+        endDate:
+          type: [string, "null"]
+          format: date
+    CourseApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Course'
+    CourseListApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Course'
+    CourseWeek:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        weekNo:
+          type: integer
+        title:
+          type: string
+        startDate:
+          type: [string, "null"]
+          format: date
+        endDate:
+          type: [string, "null"]
+          format: date
+    CourseWeekListApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/CourseWeek'
+    CourseSession:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        startsAt:
+          type: [string, "null"]
+          format: date-time
+        endsAt:
+          type: [string, "null"]
+          format: date-time
+        sessionType:
+          type: string
+        status:
+          type: string
+    CourseSessionApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/CourseSession'
+    LearningContent:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        contentType:
+          type: string
+        progressRate:
+          type: [number, "null"]
+          format: double
+    LearningContentListApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/LearningContent'
+            meta:
+              $ref: '#/components/schemas/PageMeta'
+    UpdateLearningProgressRequest:
+      type: object
+      required: [progressRate]
+      properties:
+        progressRate:
+          type: [number, "null"]
+          format: double
+          minimum: 0
+          maximum: 100
+    LearningProgressApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                contentId:
+                  type: integer
+                  format: int64
+                progressRate:
+                  type: number
+                  format: double
+    Quest:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: [string, "null"]
+        dueAt:
+          type: [string, "null"]
+          format: date-time
+        status:
+          type: string
+          enum: [OPEN, SUBMITTED, CLOSED]
+    QuestListApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Quest'
+            meta:
+              $ref: '#/components/schemas/PageMeta'
+    QuestApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Quest'
+    QuestSubmissionRequest:
+      type: object
+      required: [contentText]
+      properties:
+        contentText:
+          type: string
+        repositoryUrl:
+          type: [string, "null"]
+          format: uri
+    QuestResult:
+      type: object
+      properties:
+        questId:
+          type: integer
+          format: int64
+        submittedAt:
+          type: string
+          format: date-time
+        score:
+          type: number
+        status:
+          type: string
+          enum: [NOT_SUBMITTED, SUBMITTED, EVALUATED]
+    QuestResultApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/QuestResult'
+    Board:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        code:
+          type: string
+        boardType:
+          type: string
+        description:
+          type: [string, "null"]
+    BoardListApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Board'
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        contentText:
+          type: string
+        category:
+          type: [string, "null"]
+        authorName:
+          type: string
+        viewCount:
+          type: integer
+        likeCount:
+          type: integer
+        commentCount:
+          type: integer
+        isNotice:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    PostListApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Post'
+            meta:
+              $ref: '#/components/schemas/PageMeta'
+    PostApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Post'
+    CreatePostRequest:
+      type: object
+      required: [title, contentText]
+      properties:
+        title:
+          type: string
+        contentText:
+          type: string
+        categoryCode:
+          type: [string, "null"]
+    CreateCommentRequest:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        postId:
+          type: integer
+          format: int64
+        content:
+          type: string
+        authorName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    CommentApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Comment'
+    ExternalLink:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        url:
+          type: string
+          format: uri
+        description:
+          type: [string, "null"]
+        enabled:
+          type: boolean
+    ExternalLinkListApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExternalLink'
+    NavigationItem:
+      type: object
+      required: [key, label, path, enabled, children]
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        path:
+          type: string
+        enabled:
+          type: boolean
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavigationItem'
+    Navigation:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavigationItem'
+    NavigationApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Navigation'
+    AppBootstrap:
+      type: object
+      properties:
+        currentUser:
+          $ref: '#/components/schemas/CurrentUser'
+        navigation:
+          $ref: '#/components/schemas/Navigation'
+        notificationSummary:
+          $ref: '#/components/schemas/NotificationSummary'
+    AppBootstrapApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AppBootstrap'

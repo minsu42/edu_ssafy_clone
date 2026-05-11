@@ -1,0 +1,258 @@
+# AGENTS.md
+
+이 저장소는 `edu.ssafy.com` 교육 포털을 클론 코딩하기 위한 설계/문서 기반 프로젝트입니다. 현재는 구현 코드보다 요구사항, 디자인 시스템, DB 스키마, 구현 계획 문서가 중심입니다.
+
+## 프로젝트 목표
+
+- `edu.ssafy.com`의 핵심 사용자 경험과 화면 구조를 재현한다.
+- 1차 목표는 메인 대시보드 중심 풀스택 클론이다.
+- 실제 SSAFY 데이터나 인증 시스템과 연동하지 않고, 더미 데이터/로컬 DB/API로 재현한다.
+- 화면 유사도는 `DESIGN.md`를 최우선 기준으로 삼는다.
+
+## 현재 저장소 구조
+
+```text
+.
+├── AGENTS.md                         # 저장소 작업 규칙과 구현 지침
+├── DESIGN.md                         # SSAFY Edu Portal 디자인 시스템/토큰/레이아웃 기준
+├── docs/
+│   ├── README.md                     # 문서 인덱스
+│   ├── database/
+│   │   ├── schema.sql                # MySQL 8.x 기준 도메인 DB 스키마
+│   │   └── tables.md                 # 최종 테이블 목록과 엔티티 필드 설명
+│   ├── design/
+│   │   ├── reference-inventory.md    # 시각 참조 수집/보관 기준
+│   │   └── screenshots/              # 승인된 디자인 참조 이미지 40개
+│   ├── plans/
+│   │   ├── edu-ssafy-clone-plan.md   # 클론 코딩 전체 진행 계획
+│   │   └── software-design-plan.md   # Vue + Spring Boot 설계 계획서
+│   └── requirements/                 # 정리된 요구사항 문서
+└── .omx/                             # oh-my-codex v2 작업 상태/로그/계획
+```
+
+현재는 아직 실제 `frontend/`, `backend/`, `package.json`, `build.gradle` 등 구현 스캐폴딩이 없습니다. 새 코드를 만들 때는 아래 권장 구현 구조를 기준으로 생성하세요.
+
+## 기준 문서 우선순위
+
+작업 시 아래 순서로 문서를 확인하세요.
+
+1. `docs/plans/software-design-plan.md`
+   - 기술 스택, 1차 구현 범위, API, 프론트/백엔드 아키텍처 기준
+2. `docs/plans/edu-ssafy-clone-plan.md`
+   - 전체 구현 순서와 완료 기준
+3. `DESIGN.md`
+   - 색상, 타이포그래피, 레이아웃, 컴포넌트 스타일의 절대 기준
+4. `docs/design/reference-inventory.md` 및 `docs/design/screenshots/`
+   - 승인된 시각 참조와 스크린샷 보관 기준
+5. `docs/database/schema.sql` 및 `docs/database/tables.md`
+   - 도메인, 테이블, 컬럼, 관계, enum 값 기준
+6. `docs/requirements/*.md`
+   - 요구사항, 추적표, 상위 요구사항 확인용
+7. `.omx/plans/*.md`
+   - 실행 중인 OMX 작업 계획과 검증 지도 확인용
+
+## 예정 기술 스택
+
+`docs/plans/software-design-plan.md` 기준:
+
+- Frontend: Vue 3, Vite, Vue Router, Pinia, Axios, CSS Modules 또는 SCSS
+- Backend: Java 17+, Spring Boot 3.x, Spring Web, Spring Data JPA, Spring Security
+- Database: MySQL 또는 MariaDB
+- ORM: JPA/Hibernate
+- API: REST JSON
+- Auth: JWT 기반 인증
+- Test: JUnit 5, Spring Boot Test, Vitest, Vue Test Utils
+
+## 권장 구현 구조
+
+### Frontend
+
+```text
+frontend/
+  src/
+    app/
+      router/
+      stores/
+    assets/
+    components/
+      common/
+      dashboard/
+      layout/
+    pages/
+      DashboardPage.vue
+      LoginPage.vue
+    services/
+      apiClient.ts
+      authApi.ts
+      dashboardApi.ts
+    styles/
+      tokens.css
+      global.css
+    types/
+```
+
+### Backend
+
+```text
+backend/
+  src/main/java/com/example/edussafy/
+    auth/
+    user/
+    dashboard/
+    attendance/
+    point/
+    curriculum/
+    quest/
+    material/
+    community/
+    notification/
+    global/
+      config/
+      error/
+      security/
+      response/
+```
+
+## 1차 구현 범위
+
+메인 대시보드를 우선 구현합니다.
+
+- 공통 Header/GNB
+- 사용자 요약 정보
+- 출석 카드
+- 장학포인트/EXP/레벨 카드
+- 공지/알림 목록
+- 주차별 커리큘럼 요약
+- Quest/평가 요약
+- 학습자료 요약
+- 학습중 이러닝 영역
+- 커뮤니티 요약
+- Footer
+- e-book 플로팅 버튼
+
+## 디자인 작업 지침
+
+- `DESIGN.md`의 토큰을 CSS 변수 또는 Tailwind/Vue 스타일 토큰으로 변환해 사용하세요.
+- 기본 컨테이너 폭은 약 1200px, 흰 배경, 직각형 카드, 얇은 회색 라인을 우선합니다.
+- 주요 색상:
+  - Primary Blue: `#3396F4`
+  - Accessible Blue: `#0067B8`
+  - Navy: `#1F3448`
+  - Accent Yellow: `#FFE651`
+  - Footer Navy Deep: `#20282D`
+- 큰 radius를 임의로 추가하지 마세요. 카드/버튼은 대부분 직각형입니다.
+- 폰트는 `Noto Sans`, `Roboto`, `Malgun Gothic`, `Arial`, `sans-serif` 계열을 사용하세요.
+- 실제 SSAFY 로고/이미지를 무단 포함하지 말고, 필요한 경우 로컬 placeholder 또는 재현 가능한 더미 에셋을 사용하세요.
+
+## 백엔드/DB 작업 지침
+
+- DB 기준은 `docs/database/schema.sql`입니다.
+- MySQL 8.x / utf8mb4 기준으로 유지하세요.
+- Entity와 응답 DTO를 분리하세요.
+- API 응답은 아래 공통 형식을 따르세요.
+
+```json
+{
+  "success": true,
+  "data": {},
+  "error": null
+}
+```
+
+오류 응답:
+
+```json
+{
+  "success": false,
+  "data": null,
+  "error": {
+    "code": "AUTH_001",
+    "message": "인증이 필요합니다."
+  }
+}
+```
+
+- 인증이 필요한 API는 JWT 검증을 거치도록 설계하세요.
+- 비밀번호는 반드시 BCrypt 등 단방향 해시를 사용하세요.
+- 민감 정보는 DTO 응답에 포함하지 마세요.
+
+## API 기준
+
+1차 핵심 API:
+
+- `POST /api/auth/login`
+- `GET /api/dashboard/me`
+
+대시보드 응답에는 사용자, 출석, 포인트/레벨, 알림, 커리큘럼, Quest/평가, 학습자료, 이러닝, 커뮤니티 요약을 포함합니다.
+
+## 데이터/콘텐츠 지침
+
+- 실제 SSAFY 사용자 데이터, 교육생 정보, 내부 공지, 실제 파일을 사용하지 마세요.
+- 더미 데이터는 한국어 UI에 맞게 자연스럽게 작성하되 개인정보처럼 보이는 값은 예시임을 명확히 하세요.
+- 날짜/시간, 출석, 포인트, EXP, 게시글 수 등은 UI 검증에 충분한 샘플 데이터를 준비하세요.
+
+## 개발 순서
+
+1. 공통 레이아웃과 디자인 토큰 구성
+2. 메인 대시보드 정적 화면 구현
+3. 대시보드 더미 데이터 연결
+4. 백엔드 API와 DB 모델 구현
+5. 프론트엔드 API 연동
+6. 인증/JWT 최소 구현
+7. 반응형, 접근성, 에러/로딩 상태 개선
+8. 테스트와 문서 업데이트
+
+## 검증 기준
+
+- `DESIGN.md`의 색상/간격/카드/탭 스타일을 따르는가
+- 메인 대시보드가 `docs/plans/software-design-plan.md`의 1차 범위를 충족하는가
+- 더미 데이터만 교체해도 화면이 자연스럽게 갱신되는가
+- 공통 컴포넌트가 중복 없이 재사용되는가
+- API 응답 DTO가 민감 정보를 노출하지 않는가
+- 최소 데스크톱 기준에서 레이아웃이 깨지지 않는가
+
+## 명령어 지침
+
+현재 구현 스캐폴딩이 없으므로 고정된 빌드/테스트 명령은 없습니다. 생성 후에는 이 파일에 실제 명령을 업데이트하세요.
+
+예상 명령 예시:
+
+```sh
+# frontend 생성 후
+cd frontend
+npm install
+npm run dev
+npm run build
+npm run test
+
+# backend 생성 후
+cd backend
+./gradlew bootRun
+./gradlew test
+```
+
+존재하지 않는 명령을 성공했다고 기록하지 마세요.
+
+## OMX v2 작업 규칙
+
+이 저장소는 oh-my-codex v2 흐름을 사용합니다.
+
+- 기본 작업 흐름은 `$ultrawork`입니다.
+- 요구사항이 모호하거나 범위가 큰 경우 `$deep-interview` 또는 `$plan`으로 정리한 뒤 진행하세요.
+- 병렬 작업이 실제로 이득이 있을 때만 `$team`을 사용하세요.
+- `.omx/` 상태가 작업 내용과 어긋나지 않도록 유지하세요.
+- 장기 계획, 조사, 실행 기록이 필요한 경우 다음 파일을 갱신하세요.
+  - `.omx/plans/*.md`
+  - `.omx/research/*.md`
+  - `.omx/logs/execution-ledger.md`
+  - `.omx/state/tasks.json`
+  - `.omx/state/reviews.json`
+  - `.omx/state/inbox.json`
+
+## 금지/주의 사항
+
+- 실제 `edu.ssafy.com`의 비공개 데이터, 계정, 세션, 내부 API를 수집하거나 사용하지 마세요.
+- 실제 서비스에 부하를 주는 크롤링/자동화 접근을 하지 마세요.
+- 저작권이 있는 이미지/로고/콘텐츠를 그대로 커밋하지 마세요.
+- `claude_code*` 도구나 과거 Codex-to-Claude 분리 구조를 재도입하지 마세요.
+- `*:Zone.Identifier` 같은 Windows 메타데이터 파일은 구현 기준으로 사용하지 말고 생성되면 삭제하세요.

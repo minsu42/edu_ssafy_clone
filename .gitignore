@@ -1,0 +1,35 @@
+# OS / editor metadata
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+
+# OMX runtime state
+.omx/
+
+# Frontend dependencies/build artifacts
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.*
+!.env.example
+
+# Backend/build artifacts
+.gradle/
+build/
+out/
+target/
+*.class
+
+# IDE
+.idea/
+.vscode/
+.codex/*
+!.codex/agents/
+!.codex/agents/**
+!.codex/skills/
+!.codex/skills/**
+.codex/skills/.system/**
+!.codex/prompts/
+!.codex/prompts/**

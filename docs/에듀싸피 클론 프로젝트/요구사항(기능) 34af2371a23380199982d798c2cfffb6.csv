@@ -1,9 +1,0 @@
-식별자,요구사항명,전제조건,우선순위,상위 요구 사항 
-NFR-AUTH-LOGIN-001,로그인,,상,FR-AUTH (https://www.notion.so/FR-AUTH-34af2371a233800f9040c7041c8c1f66?pvs=21)
-NFR-AUTH-LOGOUT-001,로그아웃,NFR-AUTH-LOGIN-001 (https://www.notion.so/NFR-AUTH-LOGIN-001-34af2371a233808db76fdbfd0a39fc8f?pvs=21),상,FR-AUTH (https://www.notion.so/FR-AUTH-34af2371a233800f9040c7041c8c1f66?pvs=21)
-NFR-AUTH-SESSION-001,세션 유지 및 로그인 상태 관리,NFR-AUTH-LOGIN-001 (https://www.notion.so/NFR-AUTH-LOGIN-001-34af2371a233808db76fdbfd0a39fc8f?pvs=21),상,FR-AUTH (https://www.notion.so/FR-AUTH-34af2371a233800f9040c7041c8c1f66?pvs=21)
-NFR-AUTH-PROFILE-001,사용자 기본 정보 조회,NFR-AUTH-LOGIN-001 (https://www.notion.so/NFR-AUTH-LOGIN-001-34af2371a233808db76fdbfd0a39fc8f?pvs=21),상,FR-AUTH (https://www.notion.so/FR-AUTH-34af2371a233800f9040c7041c8c1f66?pvs=21)
-NFR-AUTH-PROFILE-002,사용자 정보 수정,NFR-AUTH-PROFILE-001 (https://www.notion.so/NFR-AUTH-PROFILE-001-34af2371a23380c194c8c89024e53547?pvs=21),중,FR-AUTH (https://www.notion.so/FR-AUTH-34af2371a233800f9040c7041c8c1f66?pvs=21)
-NFR-AUTH-CREDENTIAL-001,비밀번호 변경 / 로그인 정보 변경 기능,NFR-AUTH-LOGIN-001 (https://www.notion.so/NFR-AUTH-LOGIN-001-34af2371a233808db76fdbfd0a39fc8f?pvs=21),중,FR-AUTH (https://www.notion.so/FR-AUTH-34af2371a233800f9040c7041c8c1f66?pvs=21)
-NFR-AUTH-STATUS-001,계정 상태 검증,,상,FR-AUTH (https://www.notion.so/FR-AUTH-34af2371a233800f9040c7041c8c1f66?pvs=21)
-NFR-AUTH-WITHDRAW-001,회원 탈퇴 또는 계정 비활성화,NFR-AUTH-LOGIN-001 (https://www.notion.so/NFR-AUTH-LOGIN-001-34af2371a233808db76fdbfd0a39fc8f?pvs=21),하,FR-AUTH (https://www.notion.so/FR-AUTH-34af2371a233800f9040c7041c8c1f66?pvs=21)
