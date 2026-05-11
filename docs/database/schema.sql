@@ -8,6 +8,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS audit_logs;
 DROP TABLE IF EXISTS password_change_histories;
+DROP TABLE IF EXISTS refresh_tokens;
 DROP TABLE IF EXISTS user_agreements;
 DROP TABLE IF EXISTS agreements;
 DROP TABLE IF EXISTS notifications;
@@ -796,7 +797,24 @@ CREATE TABLE password_change_histories (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='비밀번호 변경 이력';
 
 -- ------------------------------------------------------------
--- 32. audit_logs
+-- 32. refresh_tokens
+-- JWT Refresh Token을 DB에 저장하여 로그아웃·비밀번호 변경·탈퇴 시 즉시 무효화한다.
+-- Refresh Token Rotation 및 탈취 감지에 사용된다.
+-- ------------------------------------------------------------
+CREATE TABLE refresh_tokens (
+    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '토큰 식별자',
+    user_id BIGINT NOT NULL COMMENT '토큰 소유자 유저 ID',
+    token VARCHAR(500) NOT NULL COMMENT 'JWT Refresh Token 값',
+    expires_at DATETIME NOT NULL COMMENT '토큰 만료 일시',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '토큰 발급 일시',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_refresh_tokens_token (token),
+    KEY idx_refresh_tokens_user (user_id),
+    CONSTRAINT fk_refresh_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='JWT Refresh Token';
+
+-- ------------------------------------------------------------
+-- 33. audit_logs
 -- 관리자 페이지에서 발생한 주요 변경 행위를 기록한다.
 -- ------------------------------------------------------------
 CREATE TABLE audit_logs (

@@ -7,6 +7,7 @@ public enum ErrorCode {
     RESOURCE_NOT_FOUND("ERR-CMN-001", "리소스를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
     ACCESS_DENIED("ERR-CMN-002", "접근 권한이 없습니다", HttpStatus.FORBIDDEN),
     INVALID_REQUEST("ERR-CMN-003", "잘못된 요청입니다", HttpStatus.BAD_REQUEST),
+    UNAUTHENTICATED("ERR-CMN-004", "인증이 필요합니다", HttpStatus.UNAUTHORIZED),
 
     INVALID_CREDENTIALS("ERR-AUTH-001", "이메일 또는 비밀번호가 올바르지 않습니다", HttpStatus.UNAUTHORIZED),
     ACCOUNT_INACTIVE("ERR-AUTH-002", "비활성 또는 탈퇴 계정입니다", HttpStatus.FORBIDDEN),
