@@ -8,15 +8,15 @@
 
 ## 진행 현황
 
-> 최종 업데이트: 2026-05-12 (P1-BE 완료, P1-FE 다음 단계)
+> 최종 업데이트: 2026-05-12 (P1-FE 완료, D2 다음 단계)
 
 | 페이즈 | 유형 | 이름 | 상태 | 완료일 | 상세 보고 / 비고 |
 |--------|------|------|------|--------|------------------|
 | P0 | 구현 | 프로젝트 부트스트랩 | ✅ 완료 | 2026-05-11 | [`changes/p0-project-bootstrap.md`](../changes/p0-project-bootstrap.md) · `feat/p0-project-bootstrap` |
 | D1 | 문서화 | FR-AUTH 요구사항 보완 + API 명세 | ✅ 완료 | 2026-05-11 | [`changes/d1-fr-auth-documentation.md`](../changes/d1-fr-auth-documentation.md) |
 | P1-BE | 구현 | FR-AUTH 백엔드 | ✅ 완료 | 2026-05-12 | [`changes/p1-fr-auth-implementation.md`](../changes/p1-fr-auth-implementation.md) · `feat/p1-fr-auth` |
-| P1-FE | 구현 | FR-AUTH 프론트엔드 | ⏳ 다음 단계 | — | 라우터·레이아웃·로그인·프로필 화면 + E2E |
-| D2 | 문서화 | FR-DASHBOARD 요구사항 도출 + API 명세 | ⬜ 미시작 | — | — |
+| P1-FE | 구현 | FR-AUTH 프론트엔드 | ✅ 완료 | 2026-05-12 | [`changes/p1-fe-auth.md`](../changes/p1-fe-auth.md) · `feat/p1-fe-auth` |
+| D2 | 문서화 | FR-DASHBOARD 요구사항 도출 + API 명세 | ⏳ 다음 단계 | — | — |
 | P2-BE | 구현 | FR-DASHBOARD 백엔드 | ⬜ 미시작 | — | — |
 | P2-FE | 구현 | FR-DASHBOARD 프론트엔드 | ⬜ 미시작 | — | 대시보드 화면 + E2E |
 | D3 | 문서화 | FR-LECTURE 요구사항 도출 + API 명세 | ⬜ 미시작 | — | — |
@@ -72,6 +72,21 @@
 | 실서버 API 동작 확인 | ✅ PASS — 로그인/로그아웃/토큰갱신/프로필 조회 수동 검증 |
 
 상세: [`changes/p1-fr-auth-implementation.md`](../changes/p1-fr-auth-implementation.md)
+
+### P1-FE — FR-AUTH 프론트엔드 (2026-05-12)
+
+| 완료 기준 | 결과 |
+|-----------|------|
+| `npm run test` — smoke + 스토어 + 컴포넌트 8건 GREEN | ✅ PASS |
+| 스토어 단위 테스트 4건 (로그인/실패/로그아웃/갱신) | ✅ PASS |
+| 컴포넌트 테스트 3건 (LoginPage) | ✅ PASS |
+| E2E 테스트 3건 작성 (page.route 모킹, 브라우저 설치 후 실행 가능) | ✅ 작성 완료 |
+| 라우터 인증 가드 (미인증 → /login 리다이렉트) | ✅ 구현 완료 |
+| Axios 인터셉터 (토큰 주입 + 401 시 자동 갱신) | ✅ 구현 완료 |
+| GNB 레이아웃 (스크린샷 01/37 기반) | ✅ 구현 완료 |
+| 로그인·프로필·대시보드 화면 | ✅ 구현 완료 |
+
+상세: [`changes/p1-fe-auth.md`](../changes/p1-fe-auth.md)
 
 ---
 
