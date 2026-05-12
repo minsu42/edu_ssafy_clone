@@ -17,7 +17,6 @@ function buildRouter() {
 
 describe('LoginPage', () => {
   beforeEach(() => {
-    setActivePinia(createPinia())
     localStorage.clear()
   })
 

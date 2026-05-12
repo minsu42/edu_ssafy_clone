@@ -25,43 +25,47 @@ api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config
-    if (error.response?.status === 401 && !original._retry) {
-      if (isRefreshing) {
-        return new Promise<string>((resolve, reject) => {
-          failedQueue.push({ resolve, reject })
-        }).then((token) => {
-          original.headers.Authorization = `Bearer ${token}`
-          return api(original)
-        })
-      }
-      original._retry = true
-      isRefreshing = true
-      const refreshToken = localStorage.getItem('refreshToken')
-      if (!refreshToken) {
-        processQueue(error, null)
-        isRefreshing = false
-        localStorage.clear()
-        window.location.href = '/login'
-        return Promise.reject(error)
-      }
-      try {
-        const res = await axios.post('/api/v1/auth/refresh', { refreshToken })
-        const { accessToken, refreshToken: newRefresh } = res.data.data
-        localStorage.setItem('accessToken', accessToken)
-        localStorage.setItem('refreshToken', newRefresh)
-        processQueue(null, accessToken)
-        original.headers.Authorization = `Bearer ${accessToken}`
-        return api(original)
-      } catch (err) {
-        processQueue(err, null)
-        localStorage.clear()
-        window.location.href = '/login'
-        return Promise.reject(err)
-      } finally {
-        isRefreshing = false
-      }
+    if (!original || error.response?.status !== 401 || original._retry) {
+      return Promise.reject(error)
     }
-    return Promise.reject(error)
+    if (isRefreshing) {
+      return new Promise<string>((resolve, reject) => {
+        failedQueue.push({ resolve, reject })
+      }).then((token) => {
+        original.headers.Authorization = `Bearer ${token}`
+        return api(original)
+      })
+    }
+    original._retry = true
+    isRefreshing = true
+    const refreshToken = localStorage.getItem('refreshToken')
+    if (!refreshToken) {
+      processQueue(error, null)
+      isRefreshing = false
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+      return Promise.reject(error)
+    }
+    try {
+      const res = await axios.post('/api/v1/auth/refresh', { refreshToken })
+      const { accessToken, refreshToken: newRefresh } = res.data.data
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('refreshToken', newRefresh)
+      processQueue(null, accessToken)
+      original.headers.Authorization = `Bearer ${accessToken}`
+      return api(original)
+    } catch (err) {
+      processQueue(err, null)
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+      return Promise.reject(err)
+    } finally {
+      isRefreshing = false
+    }
   },
 )
 

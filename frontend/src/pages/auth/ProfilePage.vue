@@ -62,6 +62,9 @@ async function saveProfile() {
     await authStore.updateProfile(editForm.value)
     isEditMode.value = false
     successMessage.value = '프로필이 수정되었습니다.'
+  } catch (err) {
+    const msg = authStore.errorMessage
+    successMessage.value = msg ?? '저장에 실패했습니다. 다시 시도해 주세요.'
   } finally {
     isLoading.value = false
   }
