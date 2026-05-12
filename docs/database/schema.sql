@@ -1,5 +1,5 @@
 -- Edu SSAFY Clone Schema
--- 기준 문서: /Users/baeggwan-yeol/Desktop/table.md
+-- 기준 문서: docs/database/table.md
 -- Dialect: MySQL 8.x
 -- 원칙: CMS성 메뉴/배너/운영 로그는 제외하고, 에듀싸피 클론 기능 구현에 필요한 도메인 테이블 중심으로 구성한다.
 
@@ -841,7 +841,7 @@ CREATE TABLE audit_logs (
 -- ------------------------------------------------------------
 
 -- 테스트 관리자 계정
--- 로그인 ID: admin
+-- 로그인 이메일: admin@local.test
 -- 초기 비밀번호 원문: 0000
 -- password 값은 BCrypt 해시다.
 INSERT INTO users (
@@ -853,7 +853,7 @@ INSERT INTO users (
     created_at,
     updated_at
 ) VALUES (
-    'admin',
+    'admin@local.test',
     '$2y$10$AHHy9pCT64EVMtlrAaQISuzbueIborjeIP1x8gPjynAVZHNHito2a',
     '관리자',
     'ADMIN',
