@@ -1,5 +1,4 @@
 import type { RequestHandler } from 'msw'
+import { authHandlers } from './auth'
 
-// Domain-specific handlers are added here as each phase is implemented.
-// Example: import { authHandlers } from './auth'
-export const handlers: RequestHandler[] = []
+export const handlers: RequestHandler[] = [...authHandlers]

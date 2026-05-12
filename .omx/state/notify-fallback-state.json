@@ -1,0 +1,90 @@
+{
+  "pid": 561,
+  "parent_pid": 544,
+  "started_at": "2026-05-12T00:37:59.296Z",
+  "cwd": "/home/ssafy/github/edu_ssafy_clone",
+  "notify_script": "/home/ssafy/.hermes/node/lib/node_modules/oh-my-codex/dist/scripts/notify-hook.js",
+  "authority_only": false,
+  "poll_ms": 250,
+  "effective_poll_ms": 250,
+  "idle_max_poll_ms": 1000,
+  "pid_file": "/home/ssafy/github/edu_ssafy_clone/.omx/state/notify-fallback.pid",
+  "max_lifetime_ms": 21600000,
+  "tracked_files": 1,
+  "seen_turns": 9,
+  "dispatch_drain": {
+    "enabled": true,
+    "max_per_tick": 5,
+    "run_count": 8943,
+    "leader_only": true,
+    "last_tick_at": "2026-05-12T01:21:29.538Z",
+    "last_result": {
+      "processed": 0,
+      "skipped": 0,
+      "failed": 0
+    },
+    "last_error": null
+  },
+  "leader_nudge": {
+    "enabled": true,
+    "leader_only": true,
+    "stale_threshold_ms": 180000,
+    "precomputed_leader_stale": true,
+    "last_tick_at": "2026-05-12T01:21:29.538Z",
+    "last_error": null,
+    "run_count": 8943
+  },
+  "ralph_continue_steer": {
+    "enabled": true,
+    "cadence_ms": 60000,
+    "message": "Ralph loop active continue",
+    "active": false,
+    "last_state_check_at": "2026-05-12T01:21:29.561Z",
+    "last_sent_at": "",
+    "cooldown_anchor_at": "",
+    "last_reason": "blocked_by_current_session",
+    "last_error": null,
+    "state_path": "",
+    "pane_id": "",
+    "pane_current_command": "",
+    "current_phase": "",
+    "subagent_session_id": "",
+    "active_subagent_thread_ids": [],
+    "shared_timestamp_path": "/home/ssafy/github/edu_ssafy_clone/.omx/state/ralph-last-steer-at",
+    "shared_last_sent_at": "",
+    "singleton_lock_path": "/home/ssafy/github/edu_ssafy_clone/.omx/state/ralph-continue-steer.lock"
+  },
+  "fallback_auto_nudge": {
+    "enabled": true,
+    "stall_ms": 5000,
+    "last_tick_at": "2026-05-12T01:21:29.541Z",
+    "last_turn_at": "2026-05-12T01:21:22.179Z",
+    "last_turn_count": 9,
+    "last_message": "변경했습니다.\n\n- `docker-compose.yml`\n  - MySQL 포트: `3306:3306` → `3307:3306`\n\n이제 호스트에서는:\n- DB 접속 포트: `loc",
+    "last_reason": "eligible_but_not_sent",
+    "last_error": null,
+    "last_nudged_signature": "",
+    "last_nudged_at": ""
+  },
+  "authority_backoff": {
+    "active": false,
+    "reason": "",
+    "primary_pid": null,
+    "primary_last_tick_at": "",
+    "freshness_ms": null,
+    "threshold_ms": null
+  },
+  "adaptive_poll": {
+    "enabled": true,
+    "base_ms": 250,
+    "max_ms": 1000,
+    "current_ms": 250,
+    "idle_streak": 0,
+    "last_tick_at": "2026-05-12T01:21:29.562Z",
+    "last_activity_at": "2026-05-12T01:21:29.562Z",
+    "last_activity_reason": "leader_nudge"
+  },
+  "stop_reason": "signal",
+  "stop_signal": "SIGTERM",
+  "stopping": true
+}

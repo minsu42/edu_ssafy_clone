@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "worktreeRoot": "/home/ssafy/github/edu_ssafy_clone",
+  "gitDir": "/home/ssafy/github/edu_ssafy_clone/.git",
+  "indexMtimeMs": 1778546258633.549,
+  "indexSize": 20375,
+  "map": "  frontend/: main, smoke.test, auth, server, setup, vite.config, vitest.config",
+  "createdAt": "2026-05-12T00:37:59.153Z"
+}
