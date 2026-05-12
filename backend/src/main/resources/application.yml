@@ -2,9 +2,9 @@ spring:
   application:
     name: edu
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:32768/edu_ssafy?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:test}
+    url: jdbc:mysql://localhost:32768/edu_ssafy?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
+    username: root
+    password: test
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -23,6 +23,6 @@ springdoc:
     path: /v3/api-docs
 
 jwt:
-  secret: ${JWT_SECRET:edu-ssafy-jwt-secret-key-must-be-at-least-256-bits-for-hs256-algorithm}
-  access-token-expiry: ${JWT_ACCESS_TOKEN_EXPIRY:900}
-  refresh-token-expiry: ${JWT_REFRESH_TOKEN_EXPIRY:604800}
+  secret: edu-ssafy-jwt-secret-key-must-be-at-least-256-bits-for-hs256-algorithm
+  access-token-expiry: 900
+  refresh-token-expiry: 604800

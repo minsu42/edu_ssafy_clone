@@ -5,10 +5,9 @@ import { resolve } from 'path'
 export default defineConfig({
   plugins: [vue()],
   test: {
-    environment: 'node',
+    environment: 'happy-dom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.test.ts'],
     exclude: ['e2e/**', 'node_modules/**'],
   },
   resolve: {

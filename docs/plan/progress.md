@@ -8,7 +8,6 @@
 
 ## 진행 현황
 
-> 최종 업데이트: 2026-05-12 (P2-BE 검증 이슈 수정 및 전체 백엔드 테스트 통과)
 > 최종 업데이트: 2026-05-12 (P1-FE 완료, D2 다음 단계)
 
 | 페이즈 | 유형 | 이름 | 상태 | 완료일 | 상세 보고 / 비고 |
@@ -16,9 +15,6 @@
 | P0 | 구현 | 프로젝트 부트스트랩 | ✅ 완료 | 2026-05-11 | [`changes/p0-project-bootstrap.md`](../changes/p0-project-bootstrap.md) · `feat/p0-project-bootstrap` |
 | D1 | 문서화 | FR-AUTH 요구사항 보완 + API 명세 | ✅ 완료 | 2026-05-11 | [`changes/d1-fr-auth-documentation.md`](../changes/d1-fr-auth-documentation.md) |
 | P1-BE | 구현 | FR-AUTH 백엔드 | ✅ 완료 | 2026-05-12 | [`changes/p1-fr-auth-implementation.md`](../changes/p1-fr-auth-implementation.md) · `feat/p1-fr-auth` |
-| P1-FE | 구현 | FR-AUTH 프론트엔드 | ⏳ 자동 검증 완료 | — | [`changes/p1-fe-fr-auth-implementation.md`](../changes/p1-fe-fr-auth-implementation.md) · 수동 브라우저 확인 대기 |
-| D2 | 문서화 | FR-DASHBOARD 요구사항 도출 + API 명세 | ✅ 완료 | 2026-05-12 | [`changes/d2-fr-dashboard-documentation.md`](../changes/d2-fr-dashboard-documentation.md) |
-| P2-BE | 구현 | FR-DASHBOARD 백엔드 | ✅ 완료 | 2026-05-12 | [`changes/p2-be-dashboard-validation-fix.md`](../changes/p2-be-dashboard-validation-fix.md) · Dashboard 검증 오류 수정 및 전체 테스트 63건 통과 |
 | P1-FE | 구현 | FR-AUTH 프론트엔드 | ✅ 완료 | 2026-05-12 | [`changes/p1-fe-auth.md`](../changes/p1-fe-auth.md) · `feat/p1-fe-auth` |
 | D2 | 문서화 | FR-DASHBOARD 요구사항 도출 + API 명세 | ⏳ 다음 단계 | — | — |
 | P2-BE | 구현 | FR-DASHBOARD 백엔드 | ⬜ 미시작 | — | — |
@@ -81,35 +77,6 @@
 
 | 완료 기준 | 결과 |
 |-----------|------|
-| `npx playwright test` — 로그인·로그아웃·프로필 E2E 3건 GREEN | ✅ PASS — `frontend/e2e/auth/login.spec.ts` 3건 |
-| 스토어 단위 테스트 4건 GREEN (로그인/실패/로그아웃/갱신) | ✅ PASS — `auth.store.test.ts` 4건 |
-| 컴포넌트 테스트 3건 GREEN | ✅ PASS — `LoginPage.test.ts` 3건 |
-| `npm run build` 통과 | ✅ PASS |
-| 브라우저에서 로그인 → 프로필 화면 수동 동작 확인 | ⏳ PENDING |
-
-상세: [`changes/p1-fe-fr-auth-implementation.md`](../changes/p1-fe-fr-auth-implementation.md)
-
-### D2 — FR-DASHBOARD 문서화 (2026-05-12)
-
-| 완료 기준 | 결과 |
-|-----------|------|
-| FR-DASHBOARD-* 4개 항목 정상/예외/비즈니스 규칙 기술 | ✅ PASS |
-| `docs/api/dashboard.md` 4개 조회 엔드포인트 명세 완료 | ✅ PASS |
-| 요구사항 추적표 업데이트 | ✅ PASS |
-
-상세: [`changes/d2-fr-dashboard-documentation.md`](../changes/d2-fr-dashboard-documentation.md)
-
-### P2-BE — FR-DASHBOARD 백엔드 (2026-05-12)
-
-| 완료 기준 | 결과 |
-|-----------|------|
-| Dashboard 조회 API 및 테스트 구성 | ✅ PASS |
-| DashboardController 요청 파라미터 범위 오류가 400으로 응답 | ✅ PASS |
-| `DashboardControllerTest` 7건 통과 | ✅ PASS |
-| `./gradlew test` 전체 통과 | ✅ PASS — 63건 GREEN |
-| Testcontainers 기반 통합 테스트 정상 실행 | ✅ PASS |
-
-상세: [`changes/p2-be-dashboard-validation-fix.md`](../changes/p2-be-dashboard-validation-fix.md)
 | `npm run test` — smoke + 스토어 + 컴포넌트 8건 GREEN | ✅ PASS |
 | 스토어 단위 테스트 4건 (로그인/실패/로그아웃/갱신) | ✅ PASS |
 | 컴포넌트 테스트 3건 (LoginPage) | ✅ PASS |
